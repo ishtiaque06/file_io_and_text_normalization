@@ -1,0 +1,9 @@
+This file has 959 characters.
+This file has 7 lines.
+line 0 has 19 words.
+line 1 has 13 words.
+line 2 has 0 words.
+line 3 has 34 words.
+line 4 has 35 words.
+line 5 has 9 words.
+line 6 has 34 words.
