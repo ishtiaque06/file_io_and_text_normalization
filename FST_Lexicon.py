@@ -9,6 +9,7 @@ class FST_Lexicon:
 			print line
 		input_file.close()
 
-	#def build_parameters():
+	def build_parameters():
+		print "Hello"
 
 FST_Lexicon("minidictionary.txt")
