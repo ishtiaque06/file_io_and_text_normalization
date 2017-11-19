@@ -6,35 +6,23 @@ class FST_Lexicon:
 		input_dictionary = dictionary
 		self.input_alphabet = []
 		self.output_alphabet = []
-		self.phonetic_dictionary = []
+		self.set_of_states = []
+		self.initial_state = None
+		self.output_states = []
 		self.FST_function_with_states = {}
 		input_file = open(input_dictionary, "r+")
 		self.build_parameters(input_file)
-		self.input_states = []
-		self.output_states = []
-		input_states_index = 0
-		while input_states_index < len(self.FST_function_with_states):
-			self.input_states.append(input_states_index)
-			input_states_index += 1
-		print self.input_states
-		output_states_index = 1
-		while output_states_index <= len(self.FST_function_with_states):
-			self.output_states.append(output_states_index)
-			output_states_index  += 1
-		print self.output_states
-		self.set_of_states = list(set(self.input_states + self.output_states))
-		print self.set_of_states
-		sample_FST = FST('blue', self.input_alphabet, self.output_alphabet, self.set_of_states, self.input_states, self.output_states, self.FST_function_with_states)
-		sample_FST.transition()
+		'''print set(self.set_of_states)
+		print set(self.input_alphabet)
+		print set(self.output_alphabet)
+		print set(self.output_states)
+		print self.FST_function_with_states'''
 
 	def build_parameters(self, input_file):
 		for line in input_file:
 			self.build_input_alphabet(line)
 			self.build_output_alphabet(line)
-			self.build_phonetic_dictionary(line)
-		print self.phonetic_dictionary
-		self.build_FST_Lexicon_transition_function(self.phonetic_dictionary)
-
+			self.build_word_to_phones_FST_function(line)
 	def build_input_alphabet(self, line):
 		word = line.split()[0]
 		index = 0
@@ -51,33 +39,44 @@ class FST_Lexicon:
 				self.output_alphabet.append(phonetic_word[index])
 			index += 1
 		return self.output_alphabet
-	def build_phonetic_dictionary(self, line):
+
+	def build_word_to_phones_FST_function(self, line):
 		word = line.split()[0]
 		phones = line.split()[1:]
+		index = 0
+		self.initial_state = 0
+		self.set_of_states.append(self.initial_state)
 		if len(word) > len(phones):
 			difference = len(word) - len(phones)
-			index = 0
-			while index < difference:
+			index_for_word = 0
+			while index_for_word < difference:
 				phones.append('')
-				index += 1
-		index = 0
+				index_for_word += 1
 		while index < len(word):
-			self.phonetic_dictionary.append((word[index], phones[index]))
-			index += 1
-		self.phonetic_dictionary = list(set(self.phonetic_dictionary))
-		return self.phonetic_dictionary
-	def build_FST_Lexicon_transition_function(self, dictionary_as_a_list_of_tuples):
-		index = 0
-		while index < len(dictionary_as_a_list_of_tuples):
-			#if dictionary_as_a_list_of_tuples[index][0] not in 'aeiouc':
-			self.FST_function_with_states[(index, dictionary_as_a_list_of_tuples[index][0])] = (dictionary_as_a_list_of_tuples[index][1], index+1)
-			#else:
-			'''for key in self.FST_function_with_states:
-				if dictionary_as_a_list_of_tuples[index][0] in key:
-					self.FST_function_with_states[(key[0] + 1), key[1]] = (dictionary_as_a_list_of_tuples[index][1], (key[0] + 2))'''
+			'''if (index, word[index]) in self.FST_function_with_states.keys():
+				self.FST_function_with_states[(index), (word[index])] = (index + 1), (phones[index])
+				self.set_of_states.append(index)
+				self.set_of_states.append(index + 2)
+				self.output_states.append(index)
+				self.output_states.append(index + 2)
+			else:'''
+			self.FST_function_with_states[(index), (word[index])] = ((index + 1), (phones[index]))
+			self.set_of_states.append(index)
+			self.set_of_states.append(index + 1)
+			self.output_states.append(index)
+			self.output_states.append(index + 1)
 			index += 1
 		return self.FST_function_with_states
 
-
-FST_Lexicon("minidictionary.txt")
-
+def ui():
+        print "Using minidictionary.txt file to build the dictionary of phones... \n"
+        dictionary_of_phones = FST_Lexicon("minidictionary.txt")
+        sample_FST = FST(set(dictionary_of_phones.input_alphabet), set(dictionary_of_phones.output_alphabet),\
+					 set(dictionary_of_phones.set_of_states), dictionary_of_phones.initial_state,\
+					 set(dictionary_of_phones.output_states), dictionary_of_phones.FST_function_with_states)
+        cont = 'y'
+        while cont == 'y':
+                word = raw_input("Enter the word you want to convert to phonemes: ")
+                print word + '\t' + sample_FST.get_output_string(word)
+                cont = raw_input("Would you like to test another word? (y/n)" )
+ui()

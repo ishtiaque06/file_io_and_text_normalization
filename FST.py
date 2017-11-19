@@ -1,46 +1,59 @@
-'''The FST class takes in a string and returns the corresponding output string based on the function that changes the input string to the output string. The function
-is also provided by the user.
-'''
-class FST():
-    def __init__(self, string, input_alphabet, output_alphabet, set_of_states, initial_states, final_states, transition_function):
-        self.input_string = string #input string as provided by the user
-        self.output_string = '' #output string corresponding to the input string
-        self.input_alphabet = input_alphabet #input alphabet as provided by the user
-        self.output_alphabet = output_alphabet #output alphabet as provided by the user
-        self.set_of_states = set_of_states #set of possible states the FST can have
-        self.initial_states = initial_states #initial states as input by the user
-        self.final_states = final_states #final states as defined by the user
-        self.transition_function = transition_function #transition function provided by the user, assuming it is in a dictionary form of the format as described in class.
+# Python class for finite-state transducer (FST)
+# Jane Chandlee
+# Fall 2017
+# i_alpha: set of input alphabet symbols
+# o_alpha: set of output alphabet symbols
+# states: set of states
+# start: initial state
+# finals: set of final states
+# transitions: dictionary of transitions; keys are (state, input) pairs and values are (state, output) pairs
 
-    def check_string_validity(self): #this function iterates through the input string and decides whether all the characters in the string appear in the alphabet defined.
-        index = 0
-        while index < len(self.input_string):
-            if self.input_string[index] in self.input_alphabet:
-                is_valid = True
-                index = index + 1
-            else:
-                return False
-        return True
+class FST:
+   def __init__(self, i_alpha, o_alpha, states, start, finals, transitions):
+      self.Sigma = i_alpha
+      self.Gamma = o_alpha
+      self.Q = states
+      self.I = start
+      self.F = finals
+      self.delta = transitions
+      
+      
+   # helper function that returns the transition for state q and input symbol i. If no such transition exists, returns (None, None)      
+   def get_trans(self,q,i):           
+      return self.delta.get((q,i), (None, None))
 
-    def transition(self): #This is the transition function itself, which calls upon the get_transition function updates the state of the FST and the output string with the values returned by the get_transition function.
-        if self.check_string_validity() == True:
-            index = 0
-            while index < len(self.input_string):
-                self.output_string += self.get_transition(self.initial_states, self.input_string[index])[0]
-                self.final_states = self.get_transition(self.initial_states, self.input_string[index])[1]
-                self.initial_states = self.final_states
-                index = index + 1
-            print self.output_string, ", ", self.final_states #After the final state and the output string is ready, it prints those two to the user. 
-        else:
-            print "Invalid string"
+   # takes an input string s and returns the corresponding output string, or None if the FST isn't defined for s
+   def get_output_string(self, s):
+      output = ''
+      state = self.I
+      for c in s:
+         state, next_output = self.get_trans(state,c)
+         if state:
+            output += next_output
+         else:
+            return None
+      return output
 
-    def get_transition(self, state, symbol): #this get_transition function takes in a state and symbol as key for a dictionary and outputs the state and symbol as the value. 
-        transition_relation = self.transition_function
-        return transition_relation[state, symbol]
-'''
-def demo_FST():#This demo changes a in a string to b and b to a
-    Sample_FST = FST('aaabbbbbbabababababababababaaaa', ['a', 'b'], ['a', 'b'], [0, 1], 0, 1, {(0,'b'): ('a',0), (0,'a'): ('b',1), (1,'a'): ('b',1), (1,'b'): ('a',1)})
-    Sample_FST.transition()
+def demo():
+   T = FST(set(['a', 'c', 'b', 'e', 'd', 'g', 'i', 'k', 'm', 'l', 'o', 'n', 'q', 'p', 's', 'r', 'u', 't', 'v', 'y', 'z']),\
+    set(['IY', 'JH', 'EH', 'AA', 'B', 'AE', 'D', 'G', 'K', 'M', 'L', 'N', 'P', 'S', 'R', 'EY', 'T', 'W', 'V', 'AY', 'AX', 'Z', 'IH', 'UW', 'OW']),\
+     set([0, 1, 2, 3, 4, 5, 6, 7]), 0, set([0, 1, 2, 3, 4, 5, 6, 7]), {(4, 'g'): (5, 'JH'), (1, 'm'): (2, 'M'), (0, 'r'): (1, 'R'), (0, 'l'): (1, 'L'), (0, 's'): (1, 'S'), (2, 'a'): (3, 'AE'), (1, 'i'): (2, 'AY'), (2, 'n'): (3, 'N'), (3, 'e'): (4, ''), (3, 'n'): (4, 'N'), (2, 's'): (3, 'Z'), (3, 'a'): (4, 'AE'), (0, 'o'): (1, 'OW'), (4, 'z'): (5, 'Z'), (5, 'r'): (6, 'R'), (0, 'b'): (1, 'B'), (3, 'k'): (4, 'K'), (1, 'u'): (2, 'UW'), (3, 'y'): (4, 'IY'), (4, 'r'): (5, 'R'), (1, 'q'): (2, 'K'), (4, 'e'): (5, 'EH'), (1, 'o'): (2, 'OW'), (0, 'p'): (1, 'P'), (2, 'l'): (3, 'L'), (2, 'd'): (3, 'D'), (5, 'e'): (6, ''), (0, 'a'): (1, 'AE'), (0, 'g'): (1, 'G'), (1, 'l'): (2, 'L'), (3, 'l'): (4, 'L'), (2, 'u'): (3, 'UW'), (1, 'e'): (2, 'EH'), (1, 'r'): (2, 'R'), (2, 'b'): (3, 'B'), (5, 't'): (6, 'T'), (3, 'v'): (4, 'V'), (4, 'c'): (5, 'K'), (2, 'o'): (3, 'OW'), (0, 'v'): (1, 'V'), (3, 'd'): (4, 'D')})
+   print 'Input: blue Output:',T.get_output_string('blue')
+   print 'Input: aqua Output:',T.get_output_string('aqua')
+   print 'Input: amber Output:',T.get_output_string('amber')
+   print 'Input: bronze Output:',T.get_output_string('bronze')
+   print 'Input: gold Output:',T.get_output_string('gold')
+   print 'Input: gray Output:',T.get_output_string('gray')
+   print 'Input: lilac Output:',T.get_output_string('lilac')
+   print 'Input: orange Output:',T.get_output_string('orange')
+   print 'Input: pink Output:',T.get_output_string('pink')
+   print 'Input: red Output:',T.get_output_string('red')
+   print 'Input: rose Output:',T.get_output_string('rose')
+   print 'Input: ruby Output:',T.get_output_string('ruby')
+   print 'Input: silver Output:',T.get_output_string('silver')
+   print 'Input: violet Output:',T.get_output_string('violet')
 
-demo_FST()
-'''
+if __name__=='__main__':
+   demo()
+
+
