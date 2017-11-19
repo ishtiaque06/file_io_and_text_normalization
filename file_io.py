@@ -2,6 +2,8 @@
 def lines_in_a_file():
 	input_file = open('test.txt', 'r')#Opens the input file to read.
 	output_file = open('Ishtiaque.txt', 'r+') #Opens the output file to read and write on.
+	print input_file.read()
+	input_file.seek(0)
 
 	#This section outputs the number of characters present in the input file to the output file. The number of characters include \n characters. 
 	length = str(len(input_file.read()))#This makes use of the read method which returns a string. The length takes in the resulting length in the string 
