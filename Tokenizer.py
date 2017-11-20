@@ -1,15 +1,15 @@
 # tokenizer takes a string and returns a list of the sentences contained in that string.
 def tokenizer(text):
 	end_punctuation = ['.', '!', '?', ':',';']
-   	sentence = ''
-   	sentences = []
-   	sentences_as_a_list = text.split()
-   	index = 0
+	sentence = ''
+	sentences = []
+	sentences_as_a_list = text.split()
+	index = 0
 
    	#This while block splits the input text by spaces and adds a space after the endof each word
-   	while index < len(sentences_as_a_list):
+	while index < len(sentences_as_a_list):
    		sentences_as_a_list[index] = sentences_as_a_list[index] + " "
-		index += 1
+   		index += 1
 
 	#This for block iterates through the list just formed above and is essentially a database of rules
 	#to determine whether we're at the end of the sentence.
